@@ -5,8 +5,11 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/hooks/useAuth";
 import { Layout } from "@/components/Layout";
+import { supabase } from "@/integrations/supabase/client";
+import { useEffect, useState } from "react";
 
 import Auth from "./pages/Auth";
+import Onboarding from "./pages/Onboarding";
 import Dashboard from "./pages/Dashboard";
 import Contacts from "./pages/Contacts";
 import NotFound from "./pages/NotFound";
@@ -15,8 +18,32 @@ const queryClient = new QueryClient();
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
+  const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState<boolean | null>(null);
+  
+  useEffect(() => {
+    if (!user) return;
+    
+    const checkOnboardingStatus = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('onboarding_progress')
+          .select('status')
+          .eq('user_id', user.id)
+          .maybeSingle();
 
-  if (loading) {
+        if (error) throw error;
+        
+        setHasCompletedOnboarding(data?.status === 'completed');
+      } catch (error) {
+        console.error('Error checking onboarding status:', error);
+        setHasCompletedOnboarding(false);
+      }
+    };
+
+    checkOnboardingStatus();
+  }, [user]);
+
+  if (loading || (user && hasCompletedOnboarding === null)) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
@@ -27,6 +54,11 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   if (!user) {
     return <Navigate to="/auth" replace />;
   }
+  
+  // Redirect to onboarding if not completed
+  if (hasCompletedOnboarding === false && window.location.pathname !== '/onboarding') {
+    return <Navigate to="/onboarding" replace />;
+  }
 
   return <Layout>{children}</Layout>;
 }
@@ -35,6 +67,7 @@ function AppRoutes() {
   return (
     <Routes>
       <Route path="/auth" element={<Auth />} />
+      <Route path="/onboarding" element={<Onboarding />} />
       <Route
         path="/"
         element={

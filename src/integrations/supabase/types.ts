@@ -61,6 +61,136 @@ export type Database = {
           },
         ]
       }
+      beneficial_owners: {
+        Row: {
+          address: string | null
+          aml_notes: string | null
+          aml_screened_at: string | null
+          aml_status: Database["public"]["Enums"]["verification_status"] | null
+          cin_number: string | null
+          city: string | null
+          country: string | null
+          created_at: string
+          date_of_birth: string | null
+          full_name: string
+          id: string
+          is_pep: boolean | null
+          nationality: string | null
+          organization_id: string
+          ownership_percentage: number | null
+          passport_number: string | null
+          position_title: string | null
+          updated_at: string
+        }
+        Insert: {
+          address?: string | null
+          aml_notes?: string | null
+          aml_screened_at?: string | null
+          aml_status?: Database["public"]["Enums"]["verification_status"] | null
+          cin_number?: string | null
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          date_of_birth?: string | null
+          full_name: string
+          id?: string
+          is_pep?: boolean | null
+          nationality?: string | null
+          organization_id: string
+          ownership_percentage?: number | null
+          passport_number?: string | null
+          position_title?: string | null
+          updated_at?: string
+        }
+        Update: {
+          address?: string | null
+          aml_notes?: string | null
+          aml_screened_at?: string | null
+          aml_status?: Database["public"]["Enums"]["verification_status"] | null
+          cin_number?: string | null
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          date_of_birth?: string | null
+          full_name?: string
+          id?: string
+          is_pep?: boolean | null
+          nationality?: string | null
+          organization_id?: string
+          ownership_percentage?: number | null
+          passport_number?: string | null
+          position_title?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "beneficial_owners_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      consents: {
+        Row: {
+          audit_data: Json | null
+          consent_text: string
+          consent_type: string
+          created_at: string
+          id: string
+          ip_address: unknown | null
+          is_signed: boolean | null
+          legal_basis: string | null
+          organization_id: string | null
+          signature_hash: string | null
+          signed_at: string | null
+          user_agent: string | null
+          user_id: string
+          version: string
+        }
+        Insert: {
+          audit_data?: Json | null
+          consent_text: string
+          consent_type: string
+          created_at?: string
+          id?: string
+          ip_address?: unknown | null
+          is_signed?: boolean | null
+          legal_basis?: string | null
+          organization_id?: string | null
+          signature_hash?: string | null
+          signed_at?: string | null
+          user_agent?: string | null
+          user_id: string
+          version: string
+        }
+        Update: {
+          audit_data?: Json | null
+          consent_text?: string
+          consent_type?: string
+          created_at?: string
+          id?: string
+          ip_address?: unknown | null
+          is_signed?: boolean | null
+          legal_basis?: string | null
+          organization_id?: string | null
+          signature_hash?: string | null
+          signed_at?: string | null
+          user_agent?: string | null
+          user_id?: string
+          version?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "consents_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       contacts: {
         Row: {
           address: string
@@ -274,6 +404,244 @@ export type Database = {
           },
         ]
       }
+      document_uploads: {
+        Row: {
+          created_at: string
+          document_type: string
+          file_name: string
+          file_path: string
+          file_size: number | null
+          id: string
+          is_verified: boolean | null
+          metadata: Json | null
+          mime_type: string | null
+          organization_id: string
+          uploaded_by_user_id: string
+          verification_notes: string | null
+          verified_at: string | null
+        }
+        Insert: {
+          created_at?: string
+          document_type: string
+          file_name: string
+          file_path: string
+          file_size?: number | null
+          id?: string
+          is_verified?: boolean | null
+          metadata?: Json | null
+          mime_type?: string | null
+          organization_id: string
+          uploaded_by_user_id: string
+          verification_notes?: string | null
+          verified_at?: string | null
+        }
+        Update: {
+          created_at?: string
+          document_type?: string
+          file_name?: string
+          file_path?: string
+          file_size?: number | null
+          id?: string
+          is_verified?: boolean | null
+          metadata?: Json | null
+          mime_type?: string | null
+          organization_id?: string
+          uploaded_by_user_id?: string
+          verification_notes?: string | null
+          verified_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "document_uploads_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      onboarding_progress: {
+        Row: {
+          completed_at: string | null
+          completed_steps: Json | null
+          created_at: string
+          current_step: number | null
+          id: string
+          organization_id: string
+          started_at: string | null
+          status: Database["public"]["Enums"]["onboarding_status"] | null
+          step_data: Json | null
+          total_steps: number
+          updated_at: string
+          user_id: string
+          user_role: Database["public"]["Enums"]["user_role_enum"]
+        }
+        Insert: {
+          completed_at?: string | null
+          completed_steps?: Json | null
+          created_at?: string
+          current_step?: number | null
+          id?: string
+          organization_id: string
+          started_at?: string | null
+          status?: Database["public"]["Enums"]["onboarding_status"] | null
+          step_data?: Json | null
+          total_steps: number
+          updated_at?: string
+          user_id: string
+          user_role: Database["public"]["Enums"]["user_role_enum"]
+        }
+        Update: {
+          completed_at?: string | null
+          completed_steps?: Json | null
+          created_at?: string
+          current_step?: number | null
+          id?: string
+          organization_id?: string
+          started_at?: string | null
+          status?: Database["public"]["Enums"]["onboarding_status"] | null
+          step_data?: Json | null
+          total_steps?: number
+          updated_at?: string
+          user_id?: string
+          user_role?: Database["public"]["Enums"]["user_role_enum"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "onboarding_progress_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      organizations: {
+        Row: {
+          activity_code: string | null
+          address_line1: string | null
+          address_line2: string | null
+          bank_name: string | null
+          city: string | null
+          cnss_number: string | null
+          compliance_notes: string | null
+          country: string | null
+          created_at: string
+          email: string | null
+          iban: string | null
+          ice: string | null
+          id: string
+          if_number: string | null
+          is_aml_cleared: boolean | null
+          is_banking_verified: boolean | null
+          is_cnss_verified: boolean | null
+          is_ice_verified: boolean | null
+          is_rc_verified: boolean | null
+          latitude: number | null
+          legal_name: string
+          longitude: number | null
+          onboarding_status:
+            | Database["public"]["Enums"]["onboarding_status"]
+            | null
+          organization_type: Database["public"]["Enums"]["user_role_enum"]
+          phone: string | null
+          postal_code: string | null
+          rc_number: string | null
+          rib: string | null
+          trade_name: string | null
+          updated_at: string
+          verification_data: Json | null
+          verification_status:
+            | Database["public"]["Enums"]["verification_status"]
+            | null
+          verification_tier: string | null
+          verified_at: string | null
+          website: string | null
+        }
+        Insert: {
+          activity_code?: string | null
+          address_line1?: string | null
+          address_line2?: string | null
+          bank_name?: string | null
+          city?: string | null
+          cnss_number?: string | null
+          compliance_notes?: string | null
+          country?: string | null
+          created_at?: string
+          email?: string | null
+          iban?: string | null
+          ice?: string | null
+          id?: string
+          if_number?: string | null
+          is_aml_cleared?: boolean | null
+          is_banking_verified?: boolean | null
+          is_cnss_verified?: boolean | null
+          is_ice_verified?: boolean | null
+          is_rc_verified?: boolean | null
+          latitude?: number | null
+          legal_name: string
+          longitude?: number | null
+          onboarding_status?:
+            | Database["public"]["Enums"]["onboarding_status"]
+            | null
+          organization_type: Database["public"]["Enums"]["user_role_enum"]
+          phone?: string | null
+          postal_code?: string | null
+          rc_number?: string | null
+          rib?: string | null
+          trade_name?: string | null
+          updated_at?: string
+          verification_data?: Json | null
+          verification_status?:
+            | Database["public"]["Enums"]["verification_status"]
+            | null
+          verification_tier?: string | null
+          verified_at?: string | null
+          website?: string | null
+        }
+        Update: {
+          activity_code?: string | null
+          address_line1?: string | null
+          address_line2?: string | null
+          bank_name?: string | null
+          city?: string | null
+          cnss_number?: string | null
+          compliance_notes?: string | null
+          country?: string | null
+          created_at?: string
+          email?: string | null
+          iban?: string | null
+          ice?: string | null
+          id?: string
+          if_number?: string | null
+          is_aml_cleared?: boolean | null
+          is_banking_verified?: boolean | null
+          is_cnss_verified?: boolean | null
+          is_ice_verified?: boolean | null
+          is_rc_verified?: boolean | null
+          latitude?: number | null
+          legal_name?: string
+          longitude?: number | null
+          onboarding_status?:
+            | Database["public"]["Enums"]["onboarding_status"]
+            | null
+          organization_type?: Database["public"]["Enums"]["user_role_enum"]
+          phone?: string | null
+          postal_code?: string | null
+          rc_number?: string | null
+          rib?: string | null
+          trade_name?: string | null
+          updated_at?: string
+          verification_data?: Json | null
+          verification_status?:
+            | Database["public"]["Enums"]["verification_status"]
+            | null
+          verification_tier?: string | null
+          verified_at?: string | null
+          website?: string | null
+        }
+        Relationships: []
+      }
       payments: {
         Row: {
           amount: number
@@ -423,6 +791,7 @@ export type Database = {
           id: string
           if_number: string | null
           phone: string | null
+          primary_organization_id: string | null
           rc: string | null
           role: Database["public"]["Enums"]["user_role"]
           updated_at: string
@@ -439,6 +808,7 @@ export type Database = {
           id: string
           if_number?: string | null
           phone?: string | null
+          primary_organization_id?: string | null
           rc?: string | null
           role?: Database["public"]["Enums"]["user_role"]
           updated_at?: string
@@ -455,11 +825,20 @@ export type Database = {
           id?: string
           if_number?: string | null
           phone?: string | null
+          primary_organization_id?: string | null
           rc?: string | null
           role?: Database["public"]["Enums"]["user_role"]
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profiles_primary_organization_id_fkey"
+            columns: ["primary_organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       projects: {
         Row: {
@@ -835,6 +1214,44 @@ export type Database = {
           },
         ]
       }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          is_primary: boolean | null
+          organization_id: string
+          permissions: Json | null
+          role: Database["public"]["Enums"]["user_role_enum"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_primary?: boolean | null
+          organization_id: string
+          permissions?: Json | null
+          role: Database["public"]["Enums"]["user_role_enum"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_primary?: boolean | null
+          organization_id?: string
+          permissions?: Json | null
+          role?: Database["public"]["Enums"]["user_role_enum"]
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_roles_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -850,9 +1267,12 @@ export type Database = {
         | "avoir"
         | "bon_commande"
         | "facture_fournisseur"
+      onboarding_status: "pending" | "in_progress" | "completed" | "suspended"
       payment_status: "pending" | "partial" | "paid" | "overdue" | "cancelled"
       signature_status: "pending" | "signed" | "rejected" | "expired"
       user_role: "admin" | "manager" | "user" | "accountant"
+      user_role_enum: "wholesaler" | "buyer" | "admin"
+      verification_status: "pending" | "in_progress" | "verified" | "rejected"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -988,9 +1408,12 @@ export const Constants = {
         "bon_commande",
         "facture_fournisseur",
       ],
+      onboarding_status: ["pending", "in_progress", "completed", "suspended"],
       payment_status: ["pending", "partial", "paid", "overdue", "cancelled"],
       signature_status: ["pending", "signed", "rejected", "expired"],
       user_role: ["admin", "manager", "user", "accountant"],
+      user_role_enum: ["wholesaler", "buyer", "admin"],
+      verification_status: ["pending", "in_progress", "verified", "rejected"],
     },
   },
 } as const

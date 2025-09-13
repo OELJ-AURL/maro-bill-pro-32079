@@ -38,7 +38,13 @@ export default function Auth() {
     const password = formData.get("password") as string;
     const fullName = formData.get("fullName") as string;
 
-    await signUp(email, password, fullName);
+    const { error } = await signUp(email, password, fullName);
+    
+    // Redirect to onboarding after successful signup
+    if (!error) {
+      window.location.href = '/onboarding';
+    }
+    
     setIsLoading(false);
   };
 
