@@ -5,6 +5,7 @@ import OnboardingLayout from '@/components/onboarding/OnboardingLayout';
 import RoleSelection from '@/components/onboarding/RoleSelection';
 import LegalIdentifiers from '@/components/onboarding/wholesaler/LegalIdentifiers';
 import BusinessProfile from '@/components/onboarding/wholesaler/BusinessProfile';
+import CompanyDetails from '@/components/onboarding/buyer/CompanyDetails';
 
 function OnboardingContent() {
   const { user } = useAuth();
@@ -44,7 +45,7 @@ function OnboardingContent() {
     if (userRole === 'buyer') {
       switch (currentStep) {
         case 2:
-          return <div>Company Details - TODO</div>;
+          return <CompanyDetails />;
         case 3:
           return <div>Purchasing Settings - TODO</div>;
         case 4:
