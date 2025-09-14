@@ -8,6 +8,7 @@ import { Layout } from "@/components/Layout";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
 
+import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Onboarding from "./pages/Onboarding";
 import Dashboard from "./pages/Dashboard";
@@ -59,6 +60,11 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   if (hasCompletedOnboarding === false && window.location.pathname !== '/onboarding') {
     return <Navigate to="/onboarding" replace />;
   }
+  
+  // Redirect completed users to dashboard
+  if (hasCompletedOnboarding === true && (window.location.pathname === '/' || window.location.pathname === '/auth')) {
+    return <Navigate to="/dashboard" replace />;
+  }
 
   return <Layout>{children}</Layout>;
 }
@@ -66,10 +72,11 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 function AppRoutes() {
   return (
     <Routes>
+      <Route path="/" element={<Index />} />
       <Route path="/auth" element={<Auth />} />
       <Route path="/onboarding" element={<Onboarding />} />
       <Route
-        path="/"
+        path="/dashboard"
         element={
           <ProtectedRoute>
             <Dashboard />

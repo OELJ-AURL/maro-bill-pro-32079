@@ -1257,7 +1257,13 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      create_onboarding_records: {
+        Args: { p_legal_name?: string; p_role: string }
+        Returns: {
+          onboarding_id: string
+          organization_id: string
+        }[]
+      }
     }
     Enums: {
       audit_action: "create" | "update" | "delete" | "view" | "export" | "sign"

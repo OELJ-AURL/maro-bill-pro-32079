@@ -150,54 +150,25 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
     try {
       setIsLoading(true);
 
-      // Create organization first
-      const { data: org, error: orgError } = await supabase
-        .from('organizations')
-        .insert({
-          legal_name: 'Nouvelle Organisation', // Will be updated in step 2
-          organization_type: role,
-          onboarding_status: 'in_progress'
-        })
-        .select()
-        .single();
-
-      if (orgError) throw orgError;
-
-      // Create user role
-      const { error: roleError } = await supabase
-        .from('user_roles')
-        .insert({
-          user_id: user.id,
-          organization_id: org.id,
-          role: role,
-          is_primary: true
-        });
-
-      if (roleError) throw roleError;
-
-      // Create onboarding progress
-      const { data: progress, error: progressError } = await supabase
-        .from('onboarding_progress')
-        .insert({
-          user_id: user.id,
-          organization_id: org.id,
-          user_role: role,
-          total_steps: role === 'wholesaler' ? 7 : 4,
-          current_step: 1
-        })
-        .select()
-        .single();
-
-      if (progressError) throw progressError;
-
-      setOrganizationId(org.id);
-      setOnboardingId(progress.id);
-      setUserRole(role);
-      
-      toast({
-        title: "Onboarding démarré",
-        description: `Configuration ${role === 'wholesaler' ? 'grossiste' : 'acheteur'} initialisée`,
+      // Use the atomic function to create all records
+      const { data, error } = await supabase.rpc('create_onboarding_records', {
+        p_role: role,
+        p_legal_name: 'Nouvelle Organisation'
       });
+
+      if (error) throw error;
+
+      if (data && data.length > 0) {
+        const { organization_id, onboarding_id } = data[0];
+        setOrganizationId(organization_id);
+        setOnboardingId(onboarding_id);
+        setUserRole(role);
+        
+        toast({
+          title: "Onboarding démarré",
+          description: `Configuration ${role === 'wholesaler' ? 'grossiste' : 'acheteur'} initialisée`,
+        });
+      }
     } catch (error: any) {
       console.error('Error creating onboarding record:', error);
       toast({
