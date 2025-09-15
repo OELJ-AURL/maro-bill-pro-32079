@@ -236,8 +236,7 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
         description: "Votre compte est maintenant configuré",
       });
 
-      // Redirect to dashboard
-      window.location.href = '/';
+      // Navigation handled by caller (component) after completion
     } catch (error: any) {
       console.error('Error completing onboarding:', error);
       toast({
