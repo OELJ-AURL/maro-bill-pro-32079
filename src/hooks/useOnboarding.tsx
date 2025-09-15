@@ -27,6 +27,7 @@ interface OnboardingContextType {
   
   // Actions  
   setUserRole: (role: UserRole) => void;
+  handleSetUserRole: (role: UserRole) => Promise<void>;
   updateStepData: (stepId: number, data: any) => void;
   completeStep: (stepId: number) => Promise<void>;
   goToStep: (stepId: number) => void;
@@ -181,9 +182,9 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const handleSetUserRole = (role: UserRole) => {
+  const handleSetUserRole = async (role: UserRole) => {
     setUserRole(role);
-    createOnboardingRecord(role);
+    await createOnboardingRecord(role);
   };
 
   const completeStep = async (stepId: number) => {
@@ -295,7 +296,8 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
     steps: stepsWithStatus,
     stepData,
     isLoading,
-    setUserRole: handleSetUserRole,
+    setUserRole,
+    handleSetUserRole,
     updateStepData,
     completeStep,
     goToStep,

@@ -6,6 +6,8 @@ import RoleSelection from '@/components/onboarding/RoleSelection';
 import LegalIdentifiers from '@/components/onboarding/wholesaler/LegalIdentifiers';
 import BusinessProfile from '@/components/onboarding/wholesaler/BusinessProfile';
 import CompanyDetails from '@/components/onboarding/buyer/CompanyDetails';
+import PurchasingSettings from '@/components/onboarding/buyer/PurchasingSettings';
+import BuyerConsent from '@/components/onboarding/buyer/BuyerConsent';
 
 function OnboardingContent() {
   const { user } = useAuth();
@@ -47,9 +49,9 @@ function OnboardingContent() {
         case 2:
           return <CompanyDetails />;
         case 3:
-          return <div>Purchasing Settings - TODO</div>;
+          return <PurchasingSettings />;
         case 4:
-          return <div>Consent & E-signature - TODO</div>;
+          return <BuyerConsent />;
         default:
           return <Navigate to="/" replace />;
       }

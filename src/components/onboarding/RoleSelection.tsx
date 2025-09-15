@@ -5,10 +5,10 @@ import { Badge } from '@/components/ui/badge';
 import { Building2, ShoppingCart, Check, ArrowRight } from 'lucide-react';
 
 export default function RoleSelection() {
-  const { setUserRole, isLoading, completeStep } = useOnboarding();
+  const { handleSetUserRole, isLoading, completeStep } = useOnboarding();
 
   const handleRoleSelect = async (role: 'wholesaler' | 'buyer') => {
-    setUserRole(role);
+    await handleSetUserRole(role);
     await completeStep(1);
   };
 
