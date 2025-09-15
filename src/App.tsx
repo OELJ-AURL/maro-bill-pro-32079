@@ -28,8 +28,10 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
       try {
         const { data, error } = await supabase
           .from('onboarding_progress')
-          .select('status')
+          .select('status, created_at')
           .eq('user_id', user.id)
+          .order('created_at', { ascending: false })
+          .limit(1)
           .maybeSingle();
 
         if (error) throw error;
