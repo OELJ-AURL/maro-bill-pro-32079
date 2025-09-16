@@ -5,6 +5,10 @@ import OnboardingLayout from '@/components/onboarding/OnboardingLayout';
 import RoleSelection from '@/components/onboarding/RoleSelection';
 import LegalIdentifiers from '@/components/onboarding/wholesaler/LegalIdentifiers';
 import BusinessProfile from '@/components/onboarding/wholesaler/BusinessProfile';
+import BeneficialOwners from '@/components/onboarding/wholesaler/BeneficialOwners';
+import BankingInformation from '@/components/onboarding/wholesaler/BankingInformation';
+import Declarations from '@/components/onboarding/wholesaler/Declarations';
+import Verification from '@/components/onboarding/wholesaler/Verification';
 import CompanyDetails from '@/components/onboarding/buyer/CompanyDetails';
 import PurchasingSettings from '@/components/onboarding/buyer/PurchasingSettings';
 import BuyerConsent from '@/components/onboarding/buyer/BuyerConsent';
@@ -31,13 +35,13 @@ function OnboardingContent() {
         case 3:
           return <BusinessProfile />;
         case 4:
-          return <div>Beneficial Owners - TODO</div>;
+          return <BeneficialOwners />;
         case 5:
-          return <div>Banking Info - TODO</div>;
+          return <BankingInformation />;
         case 6:
-          return <div>Declarations & E-signature - TODO</div>;
+          return <Declarations />;
         case 7:
-          return <div>Verification & Decision - TODO</div>;
+          return <Verification />;
         default:
           return <Navigate to="/" replace />;
       }
