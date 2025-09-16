@@ -27,7 +27,7 @@ interface OnboardingContextType {
   
   // Actions  
   setUserRole: (role: UserRole) => void;
-  handleSetUserRole: (role: UserRole) => Promise<void>;
+  handleSetUserRole: (role: UserRole) => Promise<boolean>;
   updateStepData: (stepId: number, data: any) => void;
   completeStep: (stepId: number) => Promise<void>;
   goToStep: (stepId: number) => void;
@@ -90,6 +90,8 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
           .from('onboarding_progress')
           .select('*')
           .eq('user_id', user.id)
+          .order('created_at', { ascending: false })
+          .limit(1)
           .maybeSingle();
 
         if (error) throw error;
@@ -145,8 +147,8 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const createOnboardingRecord = async (role: UserRole) => {
-    if (!user) return;
+  const createOnboardingRecord = async (role: UserRole): Promise<boolean> => {
+    if (!user) return false;
 
     try {
       setIsLoading(true);
@@ -163,13 +165,15 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
         const { organization_id, onboarding_id } = data[0];
         setOrganizationId(organization_id);
         setOnboardingId(onboarding_id);
-        setUserRole(role);
-        
+
         toast({
           title: "Onboarding démarré",
           description: `Configuration ${role === 'wholesaler' ? 'grossiste' : 'acheteur'} initialisée`,
         });
+        return true;
       }
+
+      return false;
     } catch (error: any) {
       console.error('Error creating onboarding record:', error);
       toast({
@@ -177,16 +181,16 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
         description: "Impossible d'initialiser l'onboarding",
         variant: "destructive",
       });
+      return false;
     } finally {
       setIsLoading(false);
     }
   };
-
-  const handleSetUserRole = async (role: UserRole) => {
-    setUserRole(role);
-    await createOnboardingRecord(role);
+  const handleSetUserRole = async (role: UserRole): Promise<boolean> => {
+    const ok = await createOnboardingRecord(role);
+    if (ok) setUserRole(role);
+    return ok;
   };
-
   const completeStep = async (stepId: number) => {
     await saveProgress();
     if (stepId < totalSteps) {
@@ -236,7 +240,9 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
         description: "Votre compte est maintenant configuré",
       });
 
-      // Navigation handled by caller (component) after completion
+      if (userRole) {
+        window.location.assign(`/dashboard/${userRole}`);
+      }
     } catch (error: any) {
       console.error('Error completing onboarding:', error);
       toast({

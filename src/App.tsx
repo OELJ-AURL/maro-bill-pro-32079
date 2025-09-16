@@ -12,6 +12,8 @@ import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Onboarding from "./pages/Onboarding";
 import Dashboard from "./pages/Dashboard";
+import WholesalerDashboard from "./pages/dashboards/WholesalerDashboard";
+import BuyerDashboard from "./pages/dashboards/BuyerDashboard";
 import Contacts from "./pages/Contacts";
 import NotFound from "./pages/NotFound";
 
@@ -20,6 +22,7 @@ const queryClient = new QueryClient();
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
   const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState<boolean | null>(null);
+  const [userRole, setUserRole] = useState<string | null>(null);
   
   useEffect(() => {
     if (!user) return;
@@ -28,7 +31,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
       try {
         const { data, error } = await supabase
           .from('onboarding_progress')
-          .select('status, created_at')
+          .select('status, user_role, created_at')
           .eq('user_id', user.id)
           .order('created_at', { ascending: false })
           .limit(1)
@@ -37,6 +40,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
         if (error) throw error;
         
         setHasCompletedOnboarding(data?.status === 'completed');
+        setUserRole(data?.user_role ?? null);
       } catch (error) {
         console.error('Error checking onboarding status:', error);
         setHasCompletedOnboarding(false);
@@ -63,9 +67,9 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
     return <Navigate to="/onboarding" replace />;
   }
   
-  // Redirect completed users to dashboard
-  if (hasCompletedOnboarding === true && (window.location.pathname === '/' || window.location.pathname === '/auth')) {
-    return <Navigate to="/dashboard" replace />;
+  // Redirect completed users to role-specific dashboard
+  if (hasCompletedOnboarding === true && (window.location.pathname === '/' || window.location.pathname === '/auth' || window.location.pathname === '/dashboard')) {
+    return <Navigate to={`/dashboard/${userRole ?? 'buyer'}`} replace />;
   }
 
   return <Layout>{children}</Layout>;
@@ -82,6 +86,22 @@ function AppRoutes() {
         element={
           <ProtectedRoute>
             <Dashboard />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/dashboard/wholesaler"
+        element={
+          <ProtectedRoute>
+            <WholesalerDashboard />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/dashboard/buyer"
+        element={
+          <ProtectedRoute>
+            <BuyerDashboard />
           </ProtectedRoute>
         }
       />

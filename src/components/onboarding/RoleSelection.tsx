@@ -8,10 +8,11 @@ export default function RoleSelection() {
   const { handleSetUserRole, isLoading, completeStep } = useOnboarding();
 
   const handleRoleSelect = async (role: 'wholesaler' | 'buyer') => {
-    await handleSetUserRole(role);
-    await completeStep(1);
+    const ok = await handleSetUserRole(role);
+    if (ok) {
+      await completeStep(1);
+    }
   };
-
   const roles = [
     {
       id: 'wholesaler' as const,
@@ -54,14 +55,15 @@ export default function RoleSelection() {
     }
   ];
 
-  return (
-    <div className="space-y-6">
-      <div className="text-center space-y-4">
-        <h2 className="text-2xl font-bold">Choisissez votre rôle</h2>
-        <p className="text-muted-foreground max-w-2xl mx-auto">
-          Sélectionnez le type de compte qui correspond à votre activité. 
-          Cette sélection déterminera les fonctionnalités disponibles et les étapes de vérification requises.
-        </p>
+return (
+    <div className="space-y-8">
+      <div className="-mx-4 md:-mx-6 px-4 md:px-6 py-8 rounded-xl bg-gradient-to-br from-primary/5 via-background to-accent/10 border">
+        <div className="text-center space-y-3">
+          <h1 className="text-3xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-primary to-foreground">Choisissez votre rôle</h1>
+          <p className="text-muted-foreground max-w-2xl mx-auto">
+            Sélectionnez le type de compte qui correspond à votre activité. Cette sélection déterminera les fonctionnalités disponibles et les étapes de vérification requises.
+          </p>
+        </div>
       </div>
 
       <div className="grid md:grid-cols-2 gap-6">
@@ -71,7 +73,7 @@ export default function RoleSelection() {
           return (
             <Card 
               key={role.id}
-              className="relative hover:shadow-lg transition-shadow cursor-pointer group"
+              className="relative hover:shadow-lg transition-all cursor-pointer group border-muted/60 hover:-translate-y-0.5"
             >
               <CardHeader className="pb-4">
                 <div className="flex items-center gap-3 mb-2">
@@ -90,13 +92,13 @@ export default function RoleSelection() {
 
               <CardContent className="space-y-4">
                 <div>
-                  <h4 className="font-semibold text-sm mb-2 text-green-700">
+                  <h4 className="font-semibold text-sm mb-2 text-primary">
                     ✓ Fonctionnalités incluses
                   </h4>
                   <ul className="space-y-1">
                     {role.features.map((feature, index) => (
                       <li key={index} className="flex items-center gap-2 text-sm">
-                        <Check className="h-4 w-4 text-green-600 flex-shrink-0" />
+                        <Check className="h-4 w-4 text-primary flex-shrink-0" />
                         <span>{feature}</span>
                       </li>
                     ))}
