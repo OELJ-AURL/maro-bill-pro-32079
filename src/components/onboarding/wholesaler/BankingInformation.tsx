@@ -13,8 +13,14 @@ import { supabase } from '@/integrations/supabase/client';
 
 const bankingSchema = z.object({
   bank_name: z.string().min(2, 'Le nom de la banque est requis'),
-  rib: z.string().min(24, 'Le RIB doit contenir au moins 24 caractères').max(24, 'Le RIB ne peut pas dépasser 24 caractères'),
-  iban: z.string().min(15, 'L\'IBAN est requis').max(34, 'L\'IBAN ne peut pas dépasser 34 caractères'),
+  rib: z.string().refine((val) => {
+    const cleanRib = val.replace(/\s/g, '');
+    return cleanRib.length === 24 && /^\d{24}$/.test(cleanRib);
+  }, 'Le RIB doit contenir exactement 24 chiffres'),
+  iban: z.string().refine((val) => {
+    const cleanIban = val.replace(/\s/g, '').toUpperCase();
+    return /^MA\d{2}\d{20}$/.test(cleanIban);
+  }, 'L\'IBAN doit commencer par MA suivi de 22 chiffres'),
 });
 
 type BankingForm = z.infer<typeof bankingSchema>;
@@ -46,37 +52,7 @@ export default function BankingInformation() {
     },
   });
 
-  const validateRIB = (rib: string) => {
-    // Basic RIB validation for Morocco (24 digits)
-    const cleanRib = rib.replace(/\s/g, '');
-    return /^\d{24}$/.test(cleanRib);
-  };
-
-  const validateIBAN = (iban: string) => {
-    // Basic IBAN validation (starts with MA for Morocco)
-    const cleanIban = iban.replace(/\s/g, '').toUpperCase();
-    return /^MA\d{2}\d{20}$/.test(cleanIban);
-  };
-
   const handleSubmit = async (data: BankingForm) => {
-    if (!validateRIB(data.rib)) {
-      toast({
-        title: 'RIB invalide',
-        description: 'Le RIB doit contenir exactement 24 chiffres.',
-        variant: 'destructive',
-      });
-      return;
-    }
-
-    if (!validateIBAN(data.iban)) {
-      toast({
-        title: 'IBAN invalide',
-        description: 'L\'IBAN doit commencer par MA suivi de 22 chiffres.',
-        variant: 'destructive',
-      });
-      return;
-    }
-
     if (!organizationId) {
       toast({
         title: 'Erreur',
