@@ -113,7 +113,7 @@ export default function Pricing() {
               <div className="flex items-center justify-between p-4 border rounded-lg">
                 <div className="space-y-1">
                   <h4 className="font-medium">Premium - Gros Volumes</h4>
-                  <p className="text-sm text-muted-foreground">Remises pour commandes >50K MAD</p>
+                  <p className="text-sm text-muted-foreground">Remises pour commandes {'>'}50K MAD</p>
                   <div className="flex gap-2">
                     <Badge variant="secondary">Actif</Badge>
                     <Badge variant="outline">1,247 produits</Badge>

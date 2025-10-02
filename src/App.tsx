@@ -11,9 +11,12 @@ import { useEffect, useState } from "react";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Onboarding from "./pages/Onboarding";
+import VerificationPending from "./pages/VerificationPending";
 import Dashboard from "./pages/Dashboard";
 import WholesalerDashboard from "./pages/dashboards/WholesalerDashboard";
 import BuyerDashboard from "./pages/dashboards/BuyerDashboard";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import VerifyOrganization from "./pages/admin/VerifyOrganization";
 import Contacts from "./pages/Contacts";
 import NotFound from "./pages/NotFound";
 
@@ -21,36 +24,60 @@ const queryClient = new QueryClient();
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
-  const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState<boolean | null>(null);
-  const [userRole, setUserRole] = useState<string | null>(null);
+  const [onboardingStatus, setOnboardingStatus] = useState<any>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [checkingStatus, setCheckingStatus] = useState(true);
   
   useEffect(() => {
     if (!user) return;
     
-    const checkOnboardingStatus = async () => {
+    const checkStatus = async () => {
       try {
-        const { data, error } = await supabase
+        // Check admin status
+        const { data: adminData } = await supabase.rpc('is_admin', { 
+          check_user_id: user.id 
+        });
+        setIsAdmin(!!adminData);
+
+        // Check onboarding status
+        const { data: onboardingData, error } = await supabase
           .from('onboarding_progress')
-          .select('status, user_role, created_at')
+          .select('status, user_role, organization_id, created_at')
           .eq('user_id', user.id)
           .order('created_at', { ascending: false })
           .limit(1)
           .maybeSingle();
 
         if (error) throw error;
-        
-        setHasCompletedOnboarding(data?.status === 'completed');
-        setUserRole(data?.user_role ?? null);
+
+        // If onboarding exists, check organization verification status
+        if (onboardingData?.organization_id) {
+          const { data: orgData } = await supabase
+            .from('organizations')
+            .select('verification_status, onboarding_status')
+            .eq('id', onboardingData.organization_id)
+            .single();
+
+          setOnboardingStatus({
+            ...onboardingData,
+            orgVerificationStatus: orgData?.verification_status,
+            orgOnboardingStatus: orgData?.onboarding_status,
+          });
+        } else {
+          setOnboardingStatus(onboardingData);
+        }
       } catch (error) {
-        console.error('Error checking onboarding status:', error);
-        setHasCompletedOnboarding(false);
+        console.error('Error checking status:', error);
+        setOnboardingStatus(null);
+      } finally {
+        setCheckingStatus(false);
       }
     };
 
-    checkOnboardingStatus();
+    checkStatus();
   }, [user]);
 
-  if (loading || (user && hasCompletedOnboarding === null)) {
+  if (loading || checkingStatus) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
@@ -61,18 +88,75 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   if (!user) {
     return <Navigate to="/auth" replace />;
   }
-  
-  // Redirect to onboarding if not completed
-  if (hasCompletedOnboarding === false && window.location.pathname !== '/onboarding') {
+
+  const currentPath = window.location.pathname;
+
+  // Admin routes
+  if (isAdmin && !currentPath.startsWith('/admin')) {
+    return <Navigate to="/admin/dashboard" replace />;
+  }
+
+  // Redirect to onboarding if not started or in progress
+  if (!isAdmin && (!onboardingStatus || onboardingStatus.status === 'in_progress') && currentPath !== '/onboarding') {
     return <Navigate to="/onboarding" replace />;
   }
-  
-  // Redirect completed users to role-specific dashboard
-  if (hasCompletedOnboarding === true && (window.location.pathname === '/' || window.location.pathname === '/auth' || window.location.pathname === '/dashboard')) {
-    return <Navigate to={`/dashboard/${userRole ?? 'buyer'}`} replace />;
+
+  // Redirect to verification pending page if completed but not verified
+  if (!isAdmin && onboardingStatus?.status === 'completed' && 
+      onboardingStatus?.orgVerificationStatus !== 'verified' &&
+      currentPath !== '/verification-pending') {
+    return <Navigate to="/verification-pending" replace />;
+  }
+
+  // Redirect to appropriate dashboard after verification
+  if (!isAdmin && onboardingStatus?.status === 'completed' && 
+      onboardingStatus?.orgVerificationStatus === 'verified' &&
+      (currentPath === '/' || currentPath === '/auth' || currentPath === '/dashboard' || 
+       currentPath === '/onboarding' || currentPath === '/verification-pending')) {
+    return <Navigate to={`/dashboard/${onboardingStatus.user_role}`} replace />;
   }
 
   return <Layout>{children}</Layout>;
+}
+
+function AdminRoute({ children }: { children: React.ReactNode }) {
+  const { user, loading } = useAuth();
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [checking, setChecking] = useState(true);
+
+  useEffect(() => {
+    if (!user) return;
+
+    const checkAdmin = async () => {
+      try {
+        const { data } = await supabase.rpc('is_admin', { 
+          check_user_id: user.id 
+        });
+        setIsAdmin(!!data);
+      } catch (error) {
+        console.error('Error checking admin:', error);
+        setIsAdmin(false);
+      } finally {
+        setChecking(false);
+      }
+    };
+
+    checkAdmin();
+  }, [user]);
+
+  if (loading || checking) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  if (!user || !isAdmin) {
+    return <Navigate to="/auth" replace />;
+  }
+
+  return <>{children}</>;
 }
 
 function AppRoutes() {
@@ -81,6 +165,23 @@ function AppRoutes() {
       <Route path="/" element={<Index />} />
       <Route path="/auth" element={<Auth />} />
       <Route path="/onboarding" element={<Onboarding />} />
+      <Route path="/verification-pending" element={<VerificationPending />} />
+      <Route
+        path="/admin/dashboard"
+        element={
+          <AdminRoute>
+            <AdminDashboard />
+          </AdminRoute>
+        }
+      />
+      <Route
+        path="/admin/verify/:id"
+        element={
+          <AdminRoute>
+            <VerifyOrganization />
+          </AdminRoute>
+        }
+      />
       <Route
         path="/dashboard"
         element={

@@ -267,30 +267,30 @@ export default function Customers() {
               <CardDescription>Notes, rappels et actions de suivi</CardDescription>
             </CardHeader>
             <CardContent>
-              <div class="space-y-4">
-                <div class="p-4 border rounded-lg bg-yellow-50">
-                  <div class="flex items-center justify-between mb-2">
-                    <h4 class="font-medium">Relance TechCorp - Devis #2024-089</h4>
+              <div className="space-y-4">
+                <div className="p-4 border rounded-lg bg-yellow-50">
+                  <div className="flex items-center justify-between mb-2">
+                    <h4 className="font-medium">Relance TechCorp - Devis #2024-089</h4>
                     <Badge variant="secondary">Urgent</Badge>
                   </div>
-                  <p class="text-sm text-muted-foreground mb-2">
+                  <p className="text-sm text-muted-foreground mb-2">
                     Relancer Ahmed pour validation devis mobilier bureau - €15,400
                   </p>
-                  <div class="flex justify-between text-sm">
+                  <div className="flex justify-between text-sm">
                     <span>Échéance: Demain</span>
                     <Button size="sm">Contacter</Button>
                   </div>
                 </div>
 
-                <div class="p-4 border rounded-lg">
-                  <div class="flex items-center justify-between mb-2">
-                    <h4 class="font-medium">Renouvellement contrat Université</h4>
+                <div className="p-4 border rounded-lg">
+                  <div className="flex items-center justify-between mb-2">
+                    <h4 className="font-medium">Renouvellement contrat Université</h4>
                     <Badge variant="outline">Normal</Badge>
                   </div>
-                  <p class="text-sm text-muted-foreground mb-2">
+                  <p className="text-sm text-muted-foreground mb-2">
                     Préparer proposition renouvellement contrat cadre 2025
                   </p>
-                  <div class="flex justify-between text-sm">
+                  <div className="flex justify-between text-sm">
                     <span>Échéance: Dans 15 jours</span>
                     <Button size="sm" variant="outline">Planifier</Button>
                   </div>

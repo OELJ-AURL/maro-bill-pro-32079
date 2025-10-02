@@ -14,6 +14,27 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
       audit_logs: {
         Row: {
           action: Database["public"]["Enums"]["audit_action"]
@@ -547,15 +568,18 @@ export type Database = {
           phone: string | null
           postal_code: string | null
           rc_number: string | null
+          rejected_reason: string | null
           rib: string | null
           trade_name: string | null
           updated_at: string
           verification_data: Json | null
+          verification_notes: string | null
           verification_status:
             | Database["public"]["Enums"]["verification_status"]
             | null
           verification_tier: string | null
           verified_at: string | null
+          verified_by: string | null
           website: string | null
         }
         Insert: {
@@ -588,15 +612,18 @@ export type Database = {
           phone?: string | null
           postal_code?: string | null
           rc_number?: string | null
+          rejected_reason?: string | null
           rib?: string | null
           trade_name?: string | null
           updated_at?: string
           verification_data?: Json | null
+          verification_notes?: string | null
           verification_status?:
             | Database["public"]["Enums"]["verification_status"]
             | null
           verification_tier?: string | null
           verified_at?: string | null
+          verified_by?: string | null
           website?: string | null
         }
         Update: {
@@ -629,15 +656,18 @@ export type Database = {
           phone?: string | null
           postal_code?: string | null
           rc_number?: string | null
+          rejected_reason?: string | null
           rib?: string | null
           trade_name?: string | null
           updated_at?: string
           verification_data?: Json | null
+          verification_notes?: string | null
           verification_status?:
             | Database["public"]["Enums"]["verification_status"]
             | null
           verification_tier?: string | null
           verified_at?: string | null
+          verified_by?: string | null
           website?: string | null
         }
         Relationships: []
@@ -1264,8 +1294,13 @@ export type Database = {
           organization_id: string
         }[]
       }
+      is_admin: {
+        Args: { check_user_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
+      app_role: "admin" | "user"
       audit_action: "create" | "update" | "delete" | "view" | "export" | "sign"
       document_type:
         | "devis"
@@ -1406,6 +1441,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      app_role: ["admin", "user"],
       audit_action: ["create", "update", "delete", "view", "export", "sign"],
       document_type: [
         "devis",

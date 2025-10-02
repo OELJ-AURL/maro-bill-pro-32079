@@ -114,22 +114,47 @@ export default function Verification() {
   };
 
   const handleCompleteOnboarding = async () => {
-    const allVerified = Object.values(status).every(value => 
-      typeof value === 'boolean' ? value : value > 0
-    );
+    if (!organizationId) return;
 
-    if (!allVerified) {
+    try {
+      setIsLoading(true);
+
+      // Submit for admin review - don't require all verifications
+      const { error: orgError } = await supabase
+        .from('organizations')
+        .update({
+          onboarding_status: 'completed',
+          verification_status: 'pending', // Set to pending for admin review
+        })
+        .eq('id', organizationId);
+
+      if (orgError) throw orgError;
+
+      // Mark onboarding as completed but pending verification
+      await supabase
+        .from('onboarding_progress')
+        .update({ status: 'completed' })
+        .eq('organization_id', organizationId);
+
       toast({
-        title: 'Vérifications incomplètes',
-        description: 'Toutes les vérifications doivent être complétées avant de finaliser l\'onboarding.',
-        variant: 'destructive',
+        title: "Demande soumise",
+        description: "Votre dossier a été soumis pour vérification. Vous recevrez une notification une fois approuvé.",
       });
-      return;
-    }
 
-    setIsLoading(true);
-    await completeOnboarding();
-    setIsLoading(false);
+      // Wait a moment then complete
+      setTimeout(() => {
+        completeOnboarding();
+      }, 1500);
+    } catch (error) {
+      console.error('Error completing onboarding:', error);
+      toast({
+        title: "Erreur",
+        description: "Une erreur s'est produite lors de la soumission.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const VerificationItem = ({ 
